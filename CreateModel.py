@@ -45,12 +45,26 @@ def GenerateUserMovieRating():
 
 """
 @INPUT:
-    R     : a matrix to be factorized, dimension N x M
-    P     : an initial matrix of dimension N x K
-    Q     : an initial matrix of dimension M x K
-    K     : the number of latent features
-    steps : the maximum number of steps to perform the optimisation
-    alpha : the learning rate
+    N : Number of users. This input is implied within the dimensions of R.
+    
+    M : Number of movies. This input is implied within the dimensions of R.
+
+    R <dimension N x M> : The matrix to be factorized. Contains all the ratings that users have 
+    assigned to the movies. Initially, this matrix would contain only the ratings that each
+    user has assigned, but after factorization, it contains the predictions as well as 
+    approximations to the original rating each user gave to the movies they actually rated.
+
+    P <dimension N x K> : Strength associations between a user and the underlying features 
+
+    Q <dimension M x K> : Strength associations between a movie and the underlying features
+    
+    K     : Number of latent features. This number tells the algorithm how many features it
+    should associate users and items to for predicting the missing ratings of a user in R
+    
+    steps : the maximum number of steps to perform the optimization
+
+    alpha : the learning rate for the gradient descent during the optimization
+    
     beta  : the regularization parameter
 @OUTPUT:
     the final matrices P and Q
