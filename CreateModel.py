@@ -96,20 +96,3 @@ if __name__ == "__main__":
     print(nR_df.head())
 
     nR_df.to_csv('RatingsModel.csv', index=False)
-
-    # R = GenerateUserMovieRating()
-    # SVD = TruncatedSVD(n_components=4)
-    # matrix = SVD.fit_transform(R.values.T)
-
-    # print(matrix.shape)
-    # print(matrix)
-
-    # corr = np.corrcoef(matrix)
-
-    # movie_title = R.columns
-    # movie_title_list = list(movie_title)
-    # coffey_hands = movie_title_list.index("Guardians of the Galaxy (2014)")
-    # corr_coffey_hands  = corr[coffey_hands]
-    # recommendations = list(movie_title[(corr_coffey_hands >= 0.9)])
-    # for recommendation in recommendations:
-    #     print(recommendation)
