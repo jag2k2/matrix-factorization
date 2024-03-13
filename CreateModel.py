@@ -22,29 +22,23 @@ def GenerateUserMovieRating():
 
     # print(rated_movies_no_ts_or_genre.shape)
     # print(rated_movies_no_ts_or_genre.values.shape)
-    # print(rated_movies_no_ts_or_genre.head(233))
 
     rated_movies = rated_movies_no_ts_or_genre.dropna(axis=0, subset=['title'])    # Remove any entries that don't have a title for some reason
     # print(rated_movies)
     # print(rated_movies.shape)
 
     rated_movies_count = rated_movies.groupby(by = ['title'])['rating'].count().reset_index().rename(columns={'rating': 'totalRatingCount'})[['title', 'totalRatingCount']]
-    # print(rated_movies_count)
     rating_with_totalRatingCount = rated_movies.merge(rated_movies_count, left_on='title', right_on='title', how='left')
 
     # print(rating_with_totalRatingCount.values.shape)
     # print(rating_with_totalRatingCount.head())
 
-    # print('dropping duplicates')
-    # rating_with_totalRatingCount.to_csv("rating_with_totalRatingCount.csv")
     user_rating = rating_with_totalRatingCount.drop_duplicates(['userId', 'title'])
-    # rating_with_totalRatingCount.duplicated(['userId', 'title']).to_csv("duplicatedList.csv")
 
     # print(user_rating.values.shape)
     # print(user_rating.head(10))
 
     user_movie_rating = user_rating.pivot(index='userId', columns='title', values='rating').fillna(0)
-    # user_movie_rating.to_csv("user_movie_rating.csv")
     # # print(user_movie_rating.values.shape)
     # print(user_movie_rating.head(10))
     return user_movie_rating
