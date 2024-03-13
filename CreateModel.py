@@ -20,26 +20,32 @@ def GenerateUserMovieRating():
 
     rated_movies_no_ts_or_genre = rated_movies_raw.drop(['timestamp', 'genres'], axis=1)
 
+    # print(rated_movies_no_ts_or_genre.shape)
     # print(rated_movies_no_ts_or_genre.values.shape)
-    # print(rated_movies_no_ts_or_genre.head(10))
+    # print(rated_movies_no_ts_or_genre.head(233))
 
     rated_movies = rated_movies_no_ts_or_genre.dropna(axis=0, subset=['title'])    # Remove any entries that don't have a title for some reason
     # print(rated_movies)
+    # print(rated_movies.shape)
 
     rated_movies_count = rated_movies.groupby(by = ['title'])['rating'].count().reset_index().rename(columns={'rating': 'totalRatingCount'})[['title', 'totalRatingCount']]
+    # print(rated_movies_count)
     rating_with_totalRatingCount = rated_movies.merge(rated_movies_count, left_on='title', right_on='title', how='left')
-    rating_with_totalRatingCount.head()
 
     # print(rating_with_totalRatingCount.values.shape)
     # print(rating_with_totalRatingCount.head())
 
+    # print('dropping duplicates')
+    # rating_with_totalRatingCount.to_csv("rating_with_totalRatingCount.csv")
     user_rating = rating_with_totalRatingCount.drop_duplicates(['userId', 'title'])
+    # rating_with_totalRatingCount.duplicated(['userId', 'title']).to_csv("duplicatedList.csv")
 
     # print(user_rating.values.shape)
     # print(user_rating.head(10))
 
     user_movie_rating = user_rating.pivot(index='userId', columns='title', values='rating').fillna(0)
-    # print(user_movie_rating.values.shape)
+    # user_movie_rating.to_csv("user_movie_rating.csv")
+    # # print(user_movie_rating.values.shape)
     # print(user_movie_rating.head(10))
     return user_movie_rating
 
@@ -64,7 +70,7 @@ def GenerateUserMovieRating():
     steps : the maximum number of steps to perform the optimization
 
     alpha : the learning rate for the gradient descent during the optimization
-    
+
     beta  : the regularization parameter
 @OUTPUT:
     the final matrices P and Q
@@ -93,6 +99,8 @@ def matrix_factorization(R, P, Q, K, steps=5000, alpha=0.0002, beta=0.02):
 
 if __name__ == "__main__":
     movie_ratings = GenerateUserMovieRating()
+
+    movie_ratings.to_csv("movieRatingsGenerated.csv")
     print(movie_ratings.head())
     movie_titles = movie_ratings.columns.to_list()
 
@@ -100,13 +108,15 @@ if __name__ == "__main__":
     N = len(R)
     M = len(R[0])
     K = 2
+    kList = [5,10,15]
+    for testK in kList: # test
+        K = testK
+        P = np.random.rand(N,K)
+        Q = np.random.rand(M,K)
+        Steps = 5000
+        nP, nQ = matrix_factorization(R, P, Q, K, steps=Steps)
+        nR = np.dot(nP, nQ.T)
+        nR_df = pd.DataFrame(nR, columns=movie_titles)
+        print(nR_df.head())
 
-    P = np.random.rand(N,K)
-    Q = np.random.rand(M,K)
-
-    nP, nQ = matrix_factorization(R, P, Q, K, steps=1000)
-    nR = np.dot(nP, nQ.T)
-    nR_df = pd.DataFrame(nR, columns=movie_titles)
-    print(nR_df.head())
-
-    nR_df.to_csv('RatingsModel.csv', index=False)
+        nR_df.to_csv("RatingsModel_k_{}_steps_{}.csv".format(K,Steps), index=False)
