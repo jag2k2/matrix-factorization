@@ -92,6 +92,7 @@ def matrix_factorization(R, P, Q, K, steps=5000, alpha=0.0002, beta=0.02):
     return P, Q.T
 
 if __name__ == "__main__":
+    
     movie_ratings = GenerateUserMovieRating()
     print(movie_ratings.head())
     movie_titles = movie_ratings.columns.to_list()
@@ -99,14 +100,18 @@ if __name__ == "__main__":
     R = np.array(movie_ratings)
     N = len(R)
     M = len(R[0])
-    K = 2
+    k_list = [2, 4, 8, 16]
+    steps_list = [10, 100, 1000, 5000]
 
-    P = np.random.rand(N,K)
-    Q = np.random.rand(M,K)
+    for K in k_list:
+        for steps in steps_list:
+            P = np.random.rand(N,K)
+            Q = np.random.rand(M,K)
 
-    nP, nQ = matrix_factorization(R, P, Q, K, steps=1000)
-    nR = np.dot(nP, nQ.T)
-    nR_df = pd.DataFrame(nR, columns=movie_titles)
-    print(nR_df.head())
+            nP, nQ = matrix_factorization(R, P, Q, K, steps)
+            nR = np.dot(nP, nQ.T)
+            nR_df = pd.DataFrame(nR, columns=movie_titles)
+            print(nR_df.head())
 
-    nR_df.to_csv('RatingsModel.csv', index=False)
+            file_name = f"RatingsModels/RatingsModel_{K}_{steps}.csv"
+            nR_df.to_csv(file_name, index=False)
